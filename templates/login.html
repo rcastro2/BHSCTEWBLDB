@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form class="form-signin" action="{{url_for('login')}}" method="post">
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h2 class="form-signin-heading">CTECSDB</h2>
+  </div>
+  <div class="panel-body">
+    <label for="inputEmail" class="sr-only">Email address</label>
+    <input type="text" id="inputEmail" name="u" class="form-control" placeholder="Username" required autofocus>
+    <label for="inputPassword" class="sr-only">Password</label>
+    <input type="password" id="inputPassword" name="p" class="form-control" placeholder="Password" required>
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" value="remember-me"> Remember me
+      </label>
+    </div>
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+  </div>
+  <div class="panel-footer">...</div>
+</div>
+
+
+</form>
+{% endblock %}

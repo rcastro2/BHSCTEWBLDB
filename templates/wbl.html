@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block foot %}
+$(document).ready(function () {
+  $(".panel-body").each(function(index){
+	   $(this).slideUp("slow");
+	})
+  $(".panel-heading").click(function () {
+      $(this).next().slideToggle("slow");
+  });
+  $('.button').click(function(){
+      var type = $(this).attr("type");
+      $(this).parent().attr("action","/wbl/" + type);
+      $(this).parent().submit();
+  });
+});
+{% endblock %}
+{% block content %}
+<!-- title activity_date location description activity_length -->
+<form class="form-signin" action="{{url_for('wbl',option='upsert')}}" method="post">
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h4 class="form-signin-heading">New WBL Activity</h4>
+  </div>
+  <div class="panel-body">
+    <label for="inputTitle" >Title</label>
+    <input type="text" id="inputTitle" name="title" class="form-control" placeholder="Title" required autofocus>
+    <label for="inputDate" >Date</label>
+    <input type="date" id="inputDate" name="activity_date" class="form-control" placeholder="Date" required>
+    <label for="inputLocation" >Location</label>
+    <input type="text" id="inputLocation" name="location" class="form-control" placeholder="Location" required>
+    <label for="inputDescription" >Description</label>
+    <textarea id="inputDescription" name="description" class="form-control" required></textarea>
+    <label for="inputStudents" >Students</label>
+    <textarea id="inputStudents" name="students" class="form-control" required></textarea>
+    <input type="submit" value="Submit">
+  </div>
+  <div class="panel-footer"></div>
+</div>
+</form>
+<div class="form-signin">
+  {% for activity in activities %}
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="form-signin-heading">{{activity.title}}</h4><i>{{activity.activity_date}}</i>
+    </div>
+    <div class="panel-body">
+      <form action="{{url_for('wbl',option='process')}}" method="post">
+        <input type="hidden" name="id" value="{{activity._id}}" />
+        <label for="inputTitle" >Title</label>
+        <input type="text" id="inputTitle" name="title" class="form-control" placeholder="Title" value="{{activity.title}}"required autofocus>
+        <label for="inputDate" >Date</label>
+        <input type="date" id="inputDate" name="activity_date" class="form-control" placeholder="Date" value="{{activity.activity_date}}"required>
+        <label for="inputLocation" >Location</label>
+        <input type="text" id="inputLocation" name="location" class="form-control" placeholder="Location" value="{{activity.location}} "required>
+        <label for="inputDescription" >Description</label>
+        <textarea id="inputDescription" name="description" class="form-control" required>{{activity.description}} </textarea>
+        <label for="inputStudents" >Students</label>
+        <textarea id="inputStudents" name="students" class="form-control" required>{% for student in activity.students %}
+{{student}}{% endfor %}</textarea>
+        <b class="button" type="upsert" id="b1">&#x2713;</b> <b class="button" type="remove" id="b2">&#x2717;</b>
+      </form>
+    </div>
+    <div class="panel-footer"></div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
