@@ -13,9 +13,9 @@ class cteDAO:
 
     def get_wbl(self,title=None):
         if title == None:
-            return self.wbl.find({})
+            return self.wbl.find({}).sort('activity_date',-1)
         else:
-            return self.wbl.find({'title':title})
+            return self.wbl.find_one({'title':title})
 
     def remove_wbl(self,title):
         return self.wbl.remove({'title':title})
@@ -27,7 +27,8 @@ class cteDAO:
         description = form['description']
         students_array = []
         for student in form['students'].replace('\r','').split('\n'):
-            self.students.update({'student_id':student},{'$addToSet':{"wbl":title}},True)
+            student_id = student[:9]
+            self.students.update({'student_id':student_id},{'$addToSet':{"wbl":title}},True)
             students_array.append(student)
 
         activity = {"title": title,
@@ -47,8 +48,16 @@ class cteDAO:
 
     def get_students(self,student=None,wbl=None):
         if wbl != None:
-            return self.students.find({'wbl':wbl})
+            return self.students.find({'wbl':wbl}).sort('last',1)
         elif student == None:
-            return self.students.find({})
+            return self.students.find({}).sort('last',1)
         else:
-            return self.students.find({'student_id':student})
+            wbls = self.get_wbl()
+            s = self.students.find_one({'student_id':student})
+            s_wbls = []
+            for wbl in s['wbl']:
+                for w in wbls:
+                    if wbl == w['title']:
+                        s_wbls.append({'title':wbl,'description':w['description'],'activity_date':w['activity_date']})
+            data = {'student_id':s['student_id'],'last':s['last'],'first':s['first'],'wbl':s_wbls}
+            return data

@@ -1,68 +1,94 @@
 {% extends "base.html" %}
-
-{% block foot %}
+{% block scriptfoot %}
 $(document).ready(function () {
-  $(".panel-body").each(function(index){
-	   $(this).slideUp("slow");
-	})
-  $(".panel-heading").click(function () {
-      $(this).next().slideToggle("slow");
-  });
   $('.button').click(function(){
       var type = $(this).attr("type");
       $(this).parent().attr("action","/wbl/" + type);
       $(this).parent().submit();
   });
+  $('a').click(function(){
+      $.getJSON($(this).attr("data"),function(result){
+            $("#head").html(result.title);
+            $("#inputTitle").val(result.title);
+            $("#inputDate").val(result.activity_date);
+            $("#inputLocation").val(result.location);
+
+            $("select option").each(function() {
+                if($(this).text() == result.description){
+                  $(this).attr('selected', true);
+                }else{
+                  $(this).attr('selected', false);
+                }
+            })
+
+            $("#inputStudents").html(result.students.join('\n'));
+      });
+  });
+  $('#add').click(function(){
+      var student = $('#listStudents').val() + "(" + $('#listStudents option:selected').text() + ")";
+      var list = $('#inputStudents').html();
+      if(list.length == 0){
+        $('#inputStudents').html(student);
+      }else{
+        $('#inputStudents').html(list + "\n" + student);
+      }
+  });
 });
 {% endblock %}
 {% block content %}
-<!-- title activity_date location description activity_length -->
-<form class="form-signin" action="{{url_for('wbl',option='upsert')}}" method="post">
-<div class="panel panel-default">
-  <div class="panel-heading">
-    <h4 class="form-signin-heading">New WBL Activity</h4>
-  </div>
-  <div class="panel-body">
-    <label for="inputTitle" >Title</label>
-    <input type="text" id="inputTitle" name="title" class="form-control" placeholder="Title" required autofocus>
-    <label for="inputDate" >Date</label>
-    <input type="date" id="inputDate" name="activity_date" class="form-control" placeholder="Date" required>
-    <label for="inputLocation" >Location</label>
-    <input type="text" id="inputLocation" name="location" class="form-control" placeholder="Location" required>
-    <label for="inputDescription" >Description</label>
-    <textarea id="inputDescription" name="description" class="form-control" required></textarea>
-    <label for="inputStudents" >Students</label>
-    <textarea id="inputStudents" name="students" class="form-control" required></textarea>
-    <input type="submit" value="Submit">
-  </div>
-  <div class="panel-footer"></div>
-</div>
-</form>
-<div class="form-signin">
-  {% for activity in activities %}
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h4 class="form-signin-heading">{{activity.title}}</h4><i>{{activity.activity_date}}</i>
-    </div>
-    <div class="panel-body">
-      <form action="{{url_for('wbl',option='process')}}" method="post">
-        <input type="hidden" name="id" value="{{activity._id}}" />
-        <label for="inputTitle" >Title</label>
-        <input type="text" id="inputTitle" name="title" class="form-control" placeholder="Title" value="{{activity.title}}"required autofocus>
-        <label for="inputDate" >Date</label>
-        <input type="date" id="inputDate" name="activity_date" class="form-control" placeholder="Date" value="{{activity.activity_date}}"required>
-        <label for="inputLocation" >Location</label>
-        <input type="text" id="inputLocation" name="location" class="form-control" placeholder="Location" value="{{activity.location}} "required>
-        <label for="inputDescription" >Description</label>
-        <textarea id="inputDescription" name="description" class="form-control" required>{{activity.description}} </textarea>
-        <label for="inputStudents" >Students</label>
-        <textarea id="inputStudents" name="students" class="form-control" required>{% for student in activity.students %}
-{{student}}{% endfor %}</textarea>
-        <b class="button" type="upsert" id="b1">&#x2713;</b> <b class="button" type="remove" id="b2">&#x2717;</b>
-      </form>
-    </div>
-    <div class="panel-footer"></div>
-  </div>
-  {% endfor %}
+<div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+          <ul class="nav nav-sidebar">
+            <li class="active"><a href="/wbl/display">New WBL<span class="sr-only">(current)</span></a></li>
+            {% for activity in activities %}
+            <li><a data="/view/wbl/{{activity.title}}">{{activity.title}}<br/>{{activity.activity_date}}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div class="col-sm-9 col-md-10 main">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h4 class="form-signin-heading" id="head">New WBL Activity</h4>
+            </div>
+            <div class="panel-body">
+              <form action="{{url_for('wbl',option='upsert')}}" method="post">
+              <input type="hidden" name="id" value="" />
+              <label for="inputTitle" >Title</label>
+              <input type="text" id="inputTitle" name="title" class="form-control" placeholder="Title" required autofocus>
+              <label for="inputDate" >Date</label>
+              <input type="date" id="inputDate" name="activity_date" class="form-control" placeholder="Date" required>
+              <label for="inputLocation" >Location</label>
+              <input type="text" id="inputLocation" name="location" class="form-control" placeholder="Location" required>
+              <label for="inputDescription" >Description</label>
+              <select id="inputDescription" name="description" class="form-control" required>
+                <option>Career Fair</option>
+                <option>Career Focused Field Trip</option>
+                <option>Compensated Internship</option>
+                <option>Competition</option>
+                <option>Guest Speaker</option>
+                <option>Interactive Project</option>
+                <option>Job Shadowing</option>
+                <option>Mentoring</option>
+                <option>Research Project</option>
+                <option>Service Learning</option>
+                <option>Student Run Enterprise</option>
+                <option>Workshop</option>
+              </select>
+              <a href="http://wblnyc.wikispaces.com" target="_blank">Work Based Learning</a><hr/>
+              <label for="inputStudents" >Students</label>
+              <select id="listStudents" style='height:27px'>
+                {% for student in students %}
+                <option value="{{student.student_id}}">{{student.last}}, {{student.first}}</option>
+                {% endfor %}
+              </select><input type="button" id="add" value="Add" />
+              <textarea id="inputStudents" name="students" class="form-control" rows="5" ></textarea>
+              <b class="button" type="upsert" id="b1">&#x2713;</b> <b class="button" type="remove" id="b2">&#x2717;</b>
+              </form>
+            </div>
+            <div class="panel-footer"></div>
+          </div>
+        </div>
+      </div>
 </div>
 {% endblock %}

@@ -1,13 +1,7 @@
 {% extends "base.html" %}
 
-{% block foot %}
+{% block scriptfoot %}
 $(document).ready(function () {
-  $(".panel-body").each(function(index){
-	   $(this).slideUp("slow");
-	})
-  $(".panel-heading").click(function () {
-      $(this).next().slideToggle("slow");
-  });
   $('.button').click(function(){
       var type = $(this).attr("type");
       $(this).parent().attr("action","/students/" + type);
@@ -16,39 +10,86 @@ $(document).ready(function () {
 });
 {% endblock %}
 {% block content %}
-<div class="form-signin">
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h4 class="form-signin-heading">Search</h4>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-4 col-md-3 sidebar"><br/>
+      <div class="panel panel-default">
+        <div class="panel-heading"></div>
+        <div class="panel-body">
+          <form action="{{url_for('students',option='display')}}" method="POST">
+            <label for="inputStudentID" >Student ID</label>
+            <input type="text" id="inputStudentID" name="studentID" class="form-control" placeholder="Student ID" autofocus>
+            <b type="studentID" class="button">Search</b><hr/>
+            <label for="inputWBLTitle" >WBL Title</label>
+            <select id="inputWBLTitle" name="wblTitle" class="form-control">
+              {% for activity in wbl %}
+                <option>{{activity.title}}</option>
+              {% endfor %}
+            </select>
+            <b type="wblTitle" class="button">Search</b>
+          </form>
+        </div>
+        <div class="panel-footer"></div>
+      </div>
     </div>
-    <div class="panel-body">
-      <form action="{{url_for('students',option='display')}}" method="POST">
-        <label for="inputStudentID" >Student ID</label>
-        <input type="text" id="inputStudentID" name="studentID" class="form-control" placeholder="Student ID" autofocus>
-        <b type="studentID" class="button">Search</b><hr/>
-        <label for="inputWBLTitle" >WBL Title</label>
-        <input type="text" id="inputWBLTitle" name="wblTitle" class="form-control" placeholder="WBL Title">
-        <b type="wblTitle" class="button">Search</b>
-      </form>
+    <div class="col-sm-8 col-md-9 main">
+      <br/>
+      {% if student %}
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h4 class="form-signin-heading">{{student.last}}, {{student.first}}</h4>
+        </div>
+        <div class="panel-body">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Type</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for wbl in student.wbl %}
+              <tr><td>{{wbl.title}}</td><td>{{wbl.description}}</td><td>{{wbl.activity_date}}</td></tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="panel-footer"></div>
+      </div>
+      {% endif %}
+      {% if students %}
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h4 class="form-signin-heading">{{title}}</h4>
+        </div>
+        <div class="panel-body">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>StudentID</th>
+                <th>Last</th>
+                <th>First</th>
+                <th>OFCL</th>
+                <th>Gender</th>
+                <th>Ethnic</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for student in students %}
+            <tr>
+              <td>{{student.student_id}}</td><td>{{student.last}}</td><td>{{student.first}}</td>
+              <td>{{student.ofcl}}</td><td>{{student.gender}}</td><td>{{student.ethnic}}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="panel-footer"></div>
+      </div>
+      {% endif %}
     </div>
-    <div class="panel-footer"></div>
   </div>
-
-
-  {% for student in students %}
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h4 class="form-signin-heading">{{student.student_id}}</h4>
-    </div>
-    <div class="panel-body">
-      <ul>
-      {% for wbl in student.wbl %}
-        <li>{{wbl}}</li>
-      {% endfor %}
-      </ul>
-    </div>
-    <div class="panel-footer"></div>
-  </div>
-  {% endfor %}
 </div>
+
 {% endblock %}

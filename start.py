@@ -1,14 +1,15 @@
-import os, cteDAO
-from pymongo import MongoClient
+import os, pymongo
+import cteDAO
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import Flask, g, render_template, request, session, redirect, url_for
+from bson.json_util import dumps
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY')
 
 @app.before_request
 def before_request():
-	con = MongoClient(os.environ.get('DATABASE_URL'))
+	con = pymongo.MongoClient(os.environ.get('DATABASE_URL'))
 	g.db = con.bhsbox
 	g.cte = cteDAO.cteDAO(g.db)
 
@@ -25,11 +26,12 @@ def login():
 		data = g.db.users.find_one({'user':u})
 		if data != None and check_password_hash(data['pwd'], p):
 			session["user"] = u
-			print "Access Granted"
-			return "Access Granted"
+			return render_template('main.html')
 		else:
 			session["user"] = None
 			return render_template('login.html')
+	elif session["user"] != None:
+		return render_template('main.html')
 	else:
 		return render_template('login.html')
 
@@ -38,13 +40,20 @@ def logout():
 	session['user'] = None
 	return redirect(url_for('index'))
 
+@app.route('/view/wbl/<option>')
+def view_wbl(option):
+	if session["user"] == None:
+		return redirect(url_for('index'))
+	return dumps(g.cte.get_wbl(option))
+
 @app.route('/wbl/<option>',methods=['GET','POST'])
 def wbl(option):
 	if session["user"] == None:
 		return redirect(url_for('index'))
 	if option == 'display':
 		data = g.cte.get_wbl()
-		return render_template('wbl.html',activities = data)
+		data2 = g.cte.get_students()
+		return render_template('wbl.html',activities = data, students = data2 )
 	elif option == 'upsert' and request.method == "POST":
 		g.cte.upsert_wbl(request.form)
 		return redirect(request.referrer)
@@ -54,19 +63,20 @@ def wbl(option):
 	else:
 		return redirect(request.referrer)
 
+
 @app.route('/students/<option>',methods=['GET','POST'])
 def students(option):
 	if session["user"] == None:
 		return redirect(url_for('index'))
+	activities = g.cte.get_wbl()
 	if option == 'display' and request.method == 'GET':
-		data = g.cte.get_students()
-		return render_template('students.html',students = data)
+		return render_template('students.html',wbl = activities)
 	elif option == 'studentID' and request.method == 'POST':
 		data = g.cte.get_students(request.form['studentID'])
-		return render_template('students.html',students = data)
+		return render_template('students.html',student = data,wbl = activities)
 	elif option == 'wblTitle' and request.method == 'POST':
 		data = g.cte.get_students(wbl=request.form['wblTitle'])
-		return render_template('students.html',students = data)
+		return render_template('students.html',students = data, wbl = activities, title = request.form['wblTitle'])
 	else:
 		return redirect(request.referrer)
 
