@@ -55,9 +55,10 @@ class cteDAO:
             wbls = self.get_wbl()
             s = self.students.find_one({'student_id':student})
             s_wbls = []
-            for wbl in s['wbl']:
-                for w in wbls:
-                    if wbl == w['title']:
-                        s_wbls.append({'title':wbl,'description':w['description'],'activity_date':w['activity_date']})
+            if 'wbl' in s:
+                for wbl in s['wbl']:
+                    for w in wbls:
+                        if wbl == w['title']:
+                            s_wbls.append({'title':wbl,'description':w['description'],'activity_date':w['activity_date']})
             data = {'student_id':s['student_id'],'last':s['last'],'first':s['first'],'wbl':s_wbls}
             return data
