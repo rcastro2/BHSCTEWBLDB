@@ -26,10 +26,21 @@ class cteDAO:
         location = form['location']
         description = form['description']
         students_array = []
-        for student in form['students'].replace('\r','').split('\n'):
+        students_in_form = form['students'].replace('\r','').split('\n')
+
+        #Adjust students collection with students not in list
+        old_students = self.get_wbl(title)
+        if old_students != None:
+            for old_student in old_students['students']:
+                if old_student not in students_in_form:
+                    self.students.update({'student_id':old_student[:9]},{'$pull':{"wbl":title}},True)
+
+        #Adjust students collections with students in list
+        for student in students_in_form:
             student_id = student[:9]
-            self.students.update({'student_id':student_id},{'$addToSet':{"wbl":title}},True)
-            students_array.append(student)
+            if len(student_id) == 9:
+                self.students.update({'student_id':student_id},{'$addToSet':{"wbl":title}},True)
+                students_array.append(student)
 
         activity = {"title": title,
                 "activity_date": activity_date,

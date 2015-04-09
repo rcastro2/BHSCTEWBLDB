@@ -2,8 +2,8 @@
 {% block scriptfoot %}
 $(document).ready(function () {
   $('.button').click(function(){
-      var type = $(this).attr("type");
-      $(this).parent().attr("action","/wbl/" + type);
+      //var type = $(this).attr("type");
+      //$(this).parent().attr("action","/wbl/" + type);
       $(this).parent().submit();
   });
   $('a').click(function(){
@@ -25,7 +25,7 @@ $(document).ready(function () {
       });
   });
   $('#add').click(function(){
-      var student = $('#listStudents').val() + "(" + $('#listStudents option:selected').text() + ")";
+      var student = $('#listStudents option:selected').val();
       var list = $('#inputStudents').html();
       if(list.length == 0){
         $('#inputStudents').html(student);
@@ -83,7 +83,10 @@ $(document).ready(function () {
                 {% endfor %}
               </select><input type="button" id="add" value="Add" />
               <textarea id="inputStudents" name="students" class="form-control" rows="5" ></textarea>
-              <b class="button" type="upsert" id="b1">&#x2713;</b> <b class="button" type="remove" id="b2">&#x2717;</b>
+              <b class="button" type="upsert" id="b1">Upload</b> <!--<b class="button" type="remove" id="b2">&#x2717;</b>-->
+              {% for student in students %}
+              <div value="{{student.student_id}}">{{student.last}}, {{student.first}}</div>
+              {% endfor %}
               </form>
             </div>
             <div class="panel-footer"></div>
