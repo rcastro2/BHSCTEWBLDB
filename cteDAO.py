@@ -53,14 +53,10 @@ class cteDAO:
 
     def get_students(self,student=None,wbl=None):
         if wbl != None:
-            print wbl
-            test =  self.wbl.find_one({'title':wbl})
-            pprint.pprint(test)
             return self.wbl.find_one({'title':wbl})
         elif student == None:
             return self.students.find({}).sort('last',1)
         elif student != None:
-
-            return self.wbl.find({'students.student_id':student})
+            return self.wbl.find({'students.student_id':student}).sort('activity_date',-1)
         else:
             return False

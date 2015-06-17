@@ -37,7 +37,7 @@ $(document).ready(function () {
       {% if student %}
       <div class="panel panel-default">
         <div class="panel-heading">
-          <h4 class="form-signin-heading">{{student.last}}, {{student.first}}</h4>
+          <h4 class="form-signin-heading">{{info.last}}, {{info.first}}</h4>
         </div>
         <div class="panel-body">
           <table class="table table-striped">
@@ -49,7 +49,7 @@ $(document).ready(function () {
               </tr>
             </thead>
             <tbody>
-            {% for wbl in student.wbl %}
+            {% for wbl in student %}
               <tr><td>{{wbl.title}}</td><td>{{wbl.description}}</td><td>{{wbl.activity_date}}</td></tr>
             {% endfor %}
             </tbody>

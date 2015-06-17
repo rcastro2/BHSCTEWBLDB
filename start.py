@@ -3,6 +3,7 @@ import cteDAO
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import Flask, g, render_template, request, session, redirect, url_for
 from bson.json_util import dumps
+from pprint import pprint
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY')
@@ -73,7 +74,12 @@ def students(option):
 		return render_template('students.html',wbl = activities)
 	elif option == 'studentID' and request.method == 'POST':
 		data = g.cte.get_students(request.form['studentID'])
-		return render_template('students.html',student = data,wbl = activities)
+		s = {}
+		for d in data[0]['students']:
+			if d['student_id'] == request.form['studentID']:
+				s['last'] = d['last']
+				s['first'] = d['first']
+		return render_template('students.html',info = s,student = data,wbl = activities)
 	elif option == 'wblTitle' and request.method == 'POST':
 		data = g.cte.get_students(wbl=request.form['wblTitle'])
 		return render_template('students.html',students = data['students'], wbl = activities, title = request.form['wblTitle'])
