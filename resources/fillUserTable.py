@@ -1,6 +1,7 @@
 import os, sys, pymongo, csv
 
-con = pymongo.MongoClient(os.environ.get('DATABASE_URL'))
+#con = pymongo.MongoClient(os.environ.get('DATABASE_URL'))
+con = pymongo.MongoClient("mongodb://localhost")
 db = con.bhsbox
 
 count = 0

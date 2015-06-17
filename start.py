@@ -52,8 +52,8 @@ def wbl(option):
 		return redirect(url_for('index'))
 	if option == 'display':
 		data = g.cte.get_wbl()
-		data2 = g.cte.get_students()
-		return render_template('wbl.html',activities = data, students = data2 )
+		#data2 = g.cte.get_students()
+		return render_template('wbl.html',activities = data, students = [] )
 	elif option == 'upsert' and request.method == "POST":
 		g.cte.upsert_wbl(request.form)
 		return redirect(request.referrer)
@@ -76,7 +76,7 @@ def students(option):
 		return render_template('students.html',student = data,wbl = activities)
 	elif option == 'wblTitle' and request.method == 'POST':
 		data = g.cte.get_students(wbl=request.form['wblTitle'])
-		return render_template('students.html',students = data, wbl = activities, title = request.form['wblTitle'])
+		return render_template('students.html',students = data['students'], wbl = activities, title = request.form['wblTitle'])
 	else:
 		return redirect(request.referrer)
 

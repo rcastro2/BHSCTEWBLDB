@@ -20,8 +20,14 @@ $(document).ready(function () {
                   $(this).attr('selected', false);
                 }
             })
+            var student_list = [];
+            var data;
+            for(i = 0; i < result.students.length; i++){
+              data = result.students[i];
+              student_list.push(data.student_id + " " + data.last + " , " + data.first);
+            }
 
-            $("#inputStudents").html(result.students.join('\n'));
+            $("#inputStudents").html(student_list.join('\n'));
       });
   });
   $('#add').click(function(){
@@ -83,10 +89,7 @@ $(document).ready(function () {
                 {% endfor %}
               </select><input type="button" id="add" value="Add" />
               <textarea id="inputStudents" name="students" class="form-control" rows="5" ></textarea>
-              <b class="button" type="upsert" id="b1">Upload</b> <!--<b class="button" type="remove" id="b2">&#x2717;</b>-->
-              {% for student in students %}
-              <div value="{{student.student_id}}">{{student.last}}, {{student.first}}</div>
-              {% endfor %}
+              <b class="button" type="upsert" id="b1">Upload</b>
               </form>
             </div>
             <div class="panel-footer"></div>

@@ -1,4 +1,3 @@
 *.csv
 *.pyc
-resources
 config.py
